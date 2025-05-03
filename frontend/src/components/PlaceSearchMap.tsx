@@ -241,7 +241,20 @@ export default function PlaceSearchMap({ tripPlan }: PlaceSearchMapProps) {
     return first?.lat && first?.lng ? { lat: first.lat, lng: first.lng } : centerDefault;
   }, [locations]);
 
-  if (!isLoaded) return <div>Loading map...</div>;
+  if (!isLoaded) return <div className="flex items-center justify-center h-full">Loading map...</div>;
+
+  // 没有行程计划时显示空状态
+  if (!tripPlan && !MOCK_TRIP_PLAN.days.length) {
+    return (
+      <div className="flex items-center justify-center h-full flex-col text-gray-400">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-16 mb-4">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z" />
+        </svg>
+        <p>Your trip plan will appear here</p>
+        <p className="text-sm mt-2">Enter your travel details to get started</p>
+      </div>
+    );
+  }
 
   return (
     <div className="px-4 py-2">
@@ -251,6 +264,12 @@ export default function PlaceSearchMap({ tripPlan }: PlaceSearchMapProps) {
         mapContainerStyle={{ width: "100%", height: "500px" }}
         onLoad={(map) => {
           mapRef.current = map;
+        }}
+        options={{
+          fullscreenControl: false,
+          streetViewControl: false,
+          mapTypeControl: false,
+          zoomControl: true,
         }}
       >
         {/* Render markers */}
@@ -302,6 +321,27 @@ export default function PlaceSearchMap({ tripPlan }: PlaceSearchMapProps) {
           </React.Fragment>
         ))}
       </GoogleMap>
+      {directionsList.length > 0 && (
+        <div className="absolute bottom-4 left-4 right-4 bg-white max-h-32 overflow-y-auto rounded-md shadow-md p-2">
+          <h3 className="text-sm font-medium mb-1">Travel Segments:</h3>
+          <div className="space-y-1">
+            {directionsList.map((dir, idx) => (
+              <div 
+                key={idx}
+                className="flex items-center text-xs p-1"
+              >
+                <div 
+                  className="size-3 rounded-full mr-2" 
+                  style={{ backgroundColor: COLORS[idx % COLORS.length] }}
+                ></div>
+                <span>
+                  Segment {idx + 1}: {dir.distance}, ~{dir.duration}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
