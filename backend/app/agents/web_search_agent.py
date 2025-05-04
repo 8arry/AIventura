@@ -7,7 +7,7 @@ from openai import AzureOpenAI
 import os, requests, json
 from typing import List, Dict
 from app.config import settings
-
+import re
 
 SERPER_KEY = settings.SERPER_API_KEY
 SERPER_ENDPOINT = settings.SERPER_ENDPOINT

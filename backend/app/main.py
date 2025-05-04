@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api import trips, messages, plan
+from app.api import trips, messages
 from contextlib import asynccontextmanager
 from app.init_db import init_models
 
@@ -21,4 +21,3 @@ app.add_middleware(
 
 app.include_router(trips.router, prefix="/api/trips", tags=["trips"])
 app.include_router(messages.router, prefix="/api", tags=["messages"])
-app.include_router(plan.router, prefix="/api", tags=["plan"])

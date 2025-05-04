@@ -24,3 +24,9 @@ export type TripDay = {
 export type TripPlan = {
     days: TripDay[];
 };
+
+export interface Session {
+    id: string;
+    title: string;
+    lastUpdated: Date;
+  }
