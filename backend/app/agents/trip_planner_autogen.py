@@ -45,6 +45,8 @@ planner = autogen.AssistantAgent(
     - search_agent: Search for travel-related information
 
     When the travel plan is complete and confirmed by the user, send the "PLAN_COMPLETE" signal to terminate the conversation.
+
+    Always explain your thought process step by step.
     """
 )
 
@@ -62,6 +64,7 @@ maps_agent = autogen.AssistantAgent(
     - optimize_route(places, city, preferences): Optimize routes
 
     "Always call the registered functions to get real-time data. Do NOT fabricate the result yourself."
+    Always explain your thought process step by step.
     """
 )
 
@@ -85,6 +88,7 @@ weather_agent = autogen.AssistantAgent(
     - get_weather_with_advice(city, date, activities): Get weather information and advice
 
     "Always call the registered functions to get real-time data. Do NOT fabricate the result yourself."
+    Always explain your thought process step by step.
     """
 )
 weather_agent.register_for_llm(description="Get weather with advice")(get_weather_with_advice)
@@ -104,6 +108,7 @@ search_agent = autogen.AssistantAgent(
     - search_with_context(query, context, top_k): Search with context
 
     "Always call the registered functions to get real-time data. Do NOT fabricate the result yourself."
+    Always explain your thought process step by step.
     """
 )
 search_agent.register_for_llm(description="Search for locations")(search_places)
@@ -119,6 +124,8 @@ report_agent = autogen.AssistantAgent(
     2. Format all information into a clear, well-structured Markdown document
     3. (Optional) Convert the Markdown into a PDF file when requested
     4. Reply with the Markdown content wrapped inside a ```json fenced block, then finish with a single line containing PLAN_COMPLETE
+    
+    Always explain your thought process step by step.
     """
 )
 
@@ -153,16 +160,15 @@ def create_trip_plan(user_input: str, start_date: Optional[datetime] = None, tri
     Returns:
         Dict: Dictionary containing travel plan information
     """
-    # Initialize chat group
-    print("Testing map_agent functions...")
+    # Initialize chat group with empty messages list
     groupchat = autogen.GroupChat(
         agents=[user_proxy, planner, maps_agent, weather_agent, search_agent, report_agent],
-        messages=[],
+        messages=[],  # Ensure empty messages list for new conversation
         max_round=50
     )
     manager = autogen.GroupChatManager(groupchat=groupchat, llm_config=llm_config)
     
-    # Start conversation
+    # Start conversation with clear context
     user_proxy.initiate_chat(
         manager,
         message=f"""Please help me plan a trip:
@@ -183,12 +189,14 @@ def create_trip_plan(user_input: str, start_date: Optional[datetime] = None, tri
         - Transportation advice
         - Clothing advice
         - Attraction ratings and reviews
+        
+        Note: This is a new trip planning request. Please ignore any previous conversations.
         """
     )
     
     # Get final result
     plan_dict = extract_final_json(groupchat.messages)
-    return plan_dict  
+    return plan_dict
 
 def save_trip_plan(plan: Dict, output_dir: str = "reports") -> Path:
     """

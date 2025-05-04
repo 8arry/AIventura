@@ -5,11 +5,10 @@ import BeatLoader from "react-spinners/BeatLoader";
 
 type ChatInputProps = {
   onSend: (message: string) => Promise<void>;
-  onPlanStart: () => Promise<void>;
   isLoading?: boolean;
 };
 
-const ChatInput: React.FC<ChatInputProps> = ({ onSend, onPlanStart, isLoading }) => {
+const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading }) => {
   const [message, setMessage] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -30,8 +29,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSend, onPlanStart, isLoading })
   const handleSend = async () => {
     if (!message.trim() || isLoading) return;
 
-    await onSend(message);  
-    await onPlanStart();    
+    await onSend(message);
     setMessage("");
     
     // Reset textarea height
@@ -41,8 +39,8 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSend, onPlanStart, isLoading })
   };
 
   return (
-    <div className="w-full border-t border-gray-200 p-4 bg-white">
-      <div className="max-w-3xl mx-auto relative">
+    <div className="p-4 bg-white">
+      <div className="relative">
         <textarea
           ref={textareaRef}
           value={message}

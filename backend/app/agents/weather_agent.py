@@ -3,7 +3,7 @@ import requests, datetime as dt, json
 from typing import Dict, List
 from datetime import datetime
 from app.config import settings
-
+import re
 
 OPENWEATHER_KEY = settings.OPENWEATHER_KEY
 if not OPENWEATHER_KEY:
